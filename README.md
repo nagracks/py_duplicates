@@ -7,7 +7,15 @@ Usage
 -----
 
 ```
-Usage
+usage: py_duplicates.py [-h] path
+
+Python Duplicates - Find duplicate
+
+positional arguments:
+  path        path where to find duplicates
+
+optional arguments:
+  -h, --help  show this help message and exit
 ```
 
 TODO
@@ -15,9 +23,11 @@ TODO
 
 `Python Duplicates` is a work in progress, so any ideas and patches are appreciated.
 
-* [ ] Find duplicates
+* [x] Find duplicates
 * [ ] Take action
-    * Delete
+    * Interactive actions
+        * For interactive action open them in text editor
+    * Delete All duplicates
     * Copy to another directory
 
 Contributing
