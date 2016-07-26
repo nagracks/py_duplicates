@@ -10,7 +10,7 @@ import argparse
 import collections
 import hashlib
 import os
- 
+
 def parse_args():
     """Parse args with argparse
     :returns: args
@@ -24,6 +24,14 @@ def parse_args():
 
     args = parser.parse_args()
     return args
+
+def get_filesize(filename):
+    """Get size of file as bytes
+
+    :filename: path to file
+    :returns (int): file size in bytes
+    """
+    return os.stat(filename).st_size
 
 def get_hash_md5(filename):
     """Get md5 hash of filename
@@ -50,23 +58,33 @@ def get_hash_md5(filename):
     # Return hexadecimal digits #
     return m.hexdigest()
 
-def hash_file_dict(path):
-    """Make hash:file dictionary, {key=hash:value=files}
+def get_filesize_dict(path):
+    """Make size:file dictionary, {key=size:value=files}
 
-    :path: full path in which to find duplicates 
+    :path: full path of file
     :returns: dictionary
-
     """
-    # Make defaultdict with list #
-    hash_file_dict = collections.defaultdict(list)
-
-    # Walk recursively on path #
-    for base_dirs, dirs, files in os.walk(path):
+    filesize_dict = collections.defaultdict(list)
+    for base_dir, dirs, files in os.walk(path):
         for filename in files:
-            # Make full path #
-            full_path = os.path.join(base_dirs, filename)
-            # Make hash:files pair #
-            hash_file_dict[get_hash_md5(full_path)].append(full_path)
+            full_path = os.path.join(base_dir, filename)
+            filesize_dict[get_filesize(full_path)].append(full_path)
+    return filesize_dict
+
+def hash_dict_from_filesize_dict(filesize_dict):
+    """Make hash:file dictionary from filesize:file dictionary
+
+    Note: only includes files which have duplicate filesizes.
+
+    :filesize_dict: dictionary, contains filesize:files
+    """
+
+    hash_file_dict = collections.defaultdict(list)
+    for size, files in filesize_dict.items():
+        if len(files) < 2:
+            continue
+        for filepath in files:
+            hash_file_dict[get_hash_md5(filepath)].append(filepath)
     return hash_file_dict
 
 def get_duplicates(hash_file_dict):
@@ -86,5 +104,6 @@ if __name__ == "__main__":
     # Commandline args #
     args = parse_args()
 
-    hash_file_dict = hash_file_dict(args.path)
+    filesize_dict = get_filesize_dict(args.path)
+    hash_file_dict = hash_dict_from_filesize_dict(filesize_dict)
     get_duplicates(hash_file_dict)
