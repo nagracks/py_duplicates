@@ -21,6 +21,10 @@ def parse_args():
     parser.add_argument('path',
                         action='store',
                         help="path where to find duplicates")
+    parser.add_argument('-d',
+                        '--delete',
+                        action='store_true',
+                        help="delete all files with duplicates")
 
     args = parser.parse_args()
     return args
@@ -100,6 +104,20 @@ def get_duplicates(hash_file_dict):
         if len(v) > 1:
             print ("Duplicate Files => {}".format(', '.join(v)))
 
+def delete_all_duplicates(hash_file_dict):
+    """Delete all files with duplicates
+
+    :hash_file_dict: dictionary, contains hash:files
+    :returns: None
+
+    """
+    for k, v in hash_file_dict.items():
+        if len(v) > 1:
+            for dup in v:
+                os.remove(dup)
+    print ("All duplicate files are deleted.")
+
+
 if __name__ == "__main__":
     # Commandline args #
     args = parse_args()
@@ -107,3 +125,5 @@ if __name__ == "__main__":
     filesize_dict = get_filesize_dict(args.path)
     hash_file_dict = hash_dict_from_filesize_dict(filesize_dict)
     get_duplicates(hash_file_dict)
+    if args.delete:
+        delete_all_duplicates(hash_file_dict)
