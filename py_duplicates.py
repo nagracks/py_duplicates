@@ -25,6 +25,11 @@ def parse_args():
                         '--delete',
                         action='store_true',
                         help="delete all files with duplicates")
+    parser.add_argument('-i',
+                        '--interactive',
+                        action='store_true',
+                        help="interactively manage duplicates")
+
 
     args = parser.parse_args()
     return args
@@ -117,6 +122,37 @@ def delete_all_duplicates(hash_file_dict):
                 os.remove(dup)
     print ("All duplicate files are deleted.")
 
+def interactive_mode(hash_file_dict):
+    """Interactively go through each of the duplicate files to choose action.
+    Interactive actions on individual files include:
+        [d]eleting duplicate
+    :hash_file_dict: dictionary, contains hash:files
+    :returns: None
+
+    """
+    print("=" * 80)
+    for k, v in hash_file_dict.items():
+        if len(v) > 1:
+            print ("Duplicate Files => {}".format(', '.join(v)))
+            while True:
+                action = input("[s]kip, take [a]ction > ").lower()
+                if action in "sa" and len(action) == 1:
+                    break
+            if action == "s":
+                continue
+            # action == "a", choose action for each of the duplicates
+            for i, dup in enumerate(v):
+                print("Duplicate {}: {}".format(i, dup))
+                while True:
+                    action = input("[s]kip, [d]elete > ")\
+                        .lower()
+                    if action in "sd" and len(action) == 1:
+                        break
+                if action == "s":
+                    continue
+                elif action == "d":
+                    os.remove(dup)
+
 
 if __name__ == "__main__":
     # Commandline args #
@@ -127,3 +163,5 @@ if __name__ == "__main__":
     get_duplicates(hash_file_dict)
     if args.delete:
         delete_all_duplicates(hash_file_dict)
+    elif args.interactive:
+        interactive_mode(hash_file_dict)
