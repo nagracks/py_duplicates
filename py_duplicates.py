@@ -122,10 +122,21 @@ def delete_all_duplicates(hash_file_dict):
                 os.remove(dup)
     print ("All duplicate files are deleted.")
 
+def view_file(filename):
+    """Reads a file and outputs the contents
+    :filename: filename of the file to be read
+    :returns: None
+
+    """
+    print("contents of {}:".format(filename))
+    with open(filename) as f:
+        print(f.read())
+
 def interactive_mode(hash_file_dict):
     """Interactively go through each of the duplicate files to choose action.
     Interactive actions on individual files include:
         [d]eleting duplicate
+        [v]iew file contents
     :hash_file_dict: dictionary, contains hash:files
     :returns: None
 
@@ -144,14 +155,18 @@ def interactive_mode(hash_file_dict):
             for i, dup in enumerate(v):
                 print("Duplicate {}: {}".format(i, dup))
                 while True:
-                    action = input("[s]kip, [d]elete > ")\
+                    action = input("[s]kip, [d]elete, [v]iew > ")\
                         .lower()
-                    if action in "sd" and len(action) == 1:
-                        break
-                if action == "s":
-                    continue
-                elif action == "d":
-                    os.remove(dup)
+                    if action in "sdv" and len(action) == 1:
+                        if action == "s":
+                            break
+                        elif action == "d":
+                            os.remove(dup)
+                            break
+                        elif action == "v":
+                            view_file(dup)
+                            # after viewing, it is assumed that the user
+                            # might want to take another action
 
 
 if __name__ == "__main__":
