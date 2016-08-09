@@ -160,9 +160,9 @@ def interactive_mode(hash_file_dict):
             for i, dup in enumerate(v):
                 print("Duplicate {}: {}".format(i, dup))
                 while True:
-                    action = input("[s]kip, [d]elete, [o]pen > ")\
+                    action = input("[s]kip, [d]elete, [o]pen [r]ename > ")\
                         .lower()
-                    if action in "sdo" and len(action) == 1:
+                    if action in "sdor" and len(action) == 1:
                         if action == "s":
                             break
                         elif action == "d":
@@ -172,6 +172,12 @@ def interactive_mode(hash_file_dict):
                             open_file(dup)
                             # after opening, it is assumed that the user
                             # might want to take another action
+                        elif action == "r":
+                            newname = input("new name > ")
+                            os.rename(dup,
+                                os.path.join(os.path.dirname(dup), newname))
+                            break
+
 
 
 if __name__ == "__main__":
