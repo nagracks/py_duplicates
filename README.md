@@ -1,21 +1,23 @@
 # Python Duplicates
 
-> `Python Duplicates` script can be use to find duplicates in filesystem, and 
+> `Python Duplicates` script can be use to find duplicates in filesystem, and
 > able you to take various action on them.
 
 Usage
 -----
 
 ```
-usage: py_duplicates.py [-h] path
+usage: py_duplicates.py [-h] [-d] [-i] path
 
 Python Duplicates - Find duplicate
 
 positional arguments:
-  path        path where to find duplicates
+  path               path where to find duplicates
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help         show this help message and exit
+  -d, --delete       delete all files with duplicates
+  -i, --interactive  interactively manage duplicates
 ```
 
 TODO
@@ -38,6 +40,5 @@ Feel free to improve `Python Duplicates`. All kind of pull-requests are welcome.
 LICENSE
 ------
 
-`Python Duplicates` is licensed under 
+`Python Duplicates` is licensed under
 [GPL3](https://github.com/nagracks/py_duplicates/blob/master/LICENSE)
-
