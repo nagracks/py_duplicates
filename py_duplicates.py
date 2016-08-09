@@ -10,6 +10,7 @@ import argparse
 import collections
 import hashlib
 import os
+import sys
 
 def parse_args():
     """Parse args with argparse
@@ -122,15 +123,19 @@ def delete_all_duplicates(hash_file_dict):
                 os.remove(dup)
     print ("All duplicate files are deleted.")
 
-def view_file(filename):
-    """Reads a file and outputs the contents
-    :filename: filename of the file to be read
+def open_file(filename):
+    """Opens file using default programs
+    :filename: filename of the file to be openned
     :returns: None
-
     """
-    print("contents of {}:".format(filename))
-    with open(filename) as f:
-        print(f.read())
+
+    if sys.platform.startswith('darwin'):   # mac
+        os.system("open {}".format(filename))
+    elif os.name == 'nt':                   # windows
+        os.system("start {}".format(filename))
+    elif os.name == 'posix':                # unix
+        os.system("xdg-open {}".format(filename))
+
 
 def interactive_mode(hash_file_dict):
     """Interactively go through each of the duplicate files to choose action.
@@ -155,17 +160,17 @@ def interactive_mode(hash_file_dict):
             for i, dup in enumerate(v):
                 print("Duplicate {}: {}".format(i, dup))
                 while True:
-                    action = input("[s]kip, [d]elete, [v]iew > ")\
+                    action = input("[s]kip, [d]elete, [o]pen > ")\
                         .lower()
-                    if action in "sdv" and len(action) == 1:
+                    if action in "sdo" and len(action) == 1:
                         if action == "s":
                             break
                         elif action == "d":
                             os.remove(dup)
                             break
-                        elif action == "v":
-                            view_file(dup)
-                            # after viewing, it is assumed that the user
+                        elif action == "o":
+                            open_file(dup)
+                            # after opening, it is assumed that the user
                             # might want to take another action
 
 
