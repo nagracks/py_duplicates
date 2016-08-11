@@ -30,6 +30,10 @@ def parse_args():
                         '--interactive',
                         action='store_true',
                         help="interactively manage duplicates")
+    parser.add_argument('-s',
+                        '--summary',
+                        action='store_true',
+                        help="display summary of duplicate search")
 
 
     args = parser.parse_args()
@@ -109,6 +113,24 @@ def get_duplicates(hash_file_dict):
         # Print them #
         if len(v) > 1:
             print ("Duplicate Files => {}".format(', '.join(v)))
+
+def summarize_duplicates(hash_file_dict):
+    """Summarize file duplicate searching
+
+    :hash_file_dict: dictionary, contains hash:files
+    :returns: dictionary containing the search summary
+
+    """
+    summary = { 'dupcount' : 0,     # number of unique files with duplicates
+                'empty' : 0,        # number of empty files
+                'duptotal' : 0 }    # overall number of duplicate files
+    for k, v in hash_file_dict.items():
+        if len(v) > 1:
+            summary['dupcount'] += 1
+            summary['duptotal'] += len(v)
+            if os.stat(v[0]).st_size == 0:
+                summary['empty'] += len(v)
+    return summary
 
 def delete_all_duplicates(hash_file_dict):
     """Delete all files with duplicates
@@ -191,3 +213,8 @@ if __name__ == "__main__":
         delete_all_duplicates(hash_file_dict)
     elif args.interactive:
         interactive_mode(hash_file_dict)
+    elif args.summary:
+        summary = summarize_duplicates(hash_file_dict)
+        print("** summary **")
+        print("{dupcount} files have duplicates, having a total of \
+{duptotal} duplicate files.\n{empty} files are empty.".format(**summary))
