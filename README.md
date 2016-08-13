@@ -28,9 +28,12 @@ TODO
 * [x] Find duplicates
 * [ ] Take action
     * Interactive actions
-        * For interactive action open them in text editor
-    * Delete All duplicates
-    * Copy to another directory
+        * [x] Open in text editor
+    * [x] Delete All duplicates
+    * [x] Move to another directory
+* [ ] Improve output display
+* [ ] Additional useful information on summary
+    * [x] Like percentage of path consumed by duplicates
 
 Contributing
 ------------
