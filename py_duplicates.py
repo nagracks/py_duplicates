@@ -34,7 +34,10 @@ def parse_args():
                         '--summary',
                         action='store_true',
                         help="display summary of duplicate search")
-
+    parser.add_argument('-m',
+                        '--move',
+                        metavar='DIR',
+                        help="move all duplicates to another directory")
 
     args = parser.parse_args()
     return args
@@ -145,6 +148,24 @@ def delete_all_duplicates(hash_file_dict):
                 os.remove(dup)
     print ("All duplicate files are deleted.")
 
+def move_duplicates(hash_file_dict, dirname):
+    """Move duplicates to location specified by parameter dirname
+
+    :hash_file_dict: dictionary, contains hash:files
+    :dirname: location on where to transfer duplicates
+    :returns: None
+
+    """
+    if not os.path.isdir(dirname):
+        print("Invalid Directory {}. Aborted.".format(dirname))
+        return
+
+    for k, v in hash_file_dict.items():
+        if len(v) > 1:
+            for dup in v:
+                os.rename(dup, os.path.join(dirname, os.path.basename(dup)))
+    print ("All duplicate files are moved to {}.".format(dirname))
+
 def open_file(filename):
     """Opens file using default programs
     :filename: filename of the file to be openned
@@ -182,9 +203,9 @@ def interactive_mode(hash_file_dict):
             for i, dup in enumerate(v):
                 print("Duplicate {}: {}".format(i, dup))
                 while True:
-                    action = input("[s]kip, [d]elete, [o]pen [r]ename > ")\
+                    action = input("[s]kip [d]elete [o]pen [r]ename [m]ove > ")\
                         .lower()
-                    if action in "sdor" and len(action) == 1:
+                    if action in "sdorm" and len(action) == 1:
                         if action == "s":
                             break
                         elif action == "d":
@@ -198,6 +219,14 @@ def interactive_mode(hash_file_dict):
                             newname = input("new name > ")
                             os.rename(dup,
                                 os.path.join(os.path.dirname(dup), newname))
+                            break
+                        elif action == "m":
+                            while True:
+                                destdir = input("directory name > ")
+                                if os.path.isdir(destdir):
+                                    break
+                            os.rename(dup,
+                                os.path.join(destdir, os.path.basename(dup)))
                             break
 
 
@@ -218,3 +247,5 @@ if __name__ == "__main__":
         print("** summary **")
         print("{dupcount} files have duplicates, having a total of \
 {duptotal} duplicate files.\n{empty} files are empty.".format(**summary))
+    elif args.move:
+        move_duplicates(hash_file_dict, args.move)
