@@ -41,4 +41,4 @@ LICENSE
 ------
 
 `Python Duplicates` is licensed under
-[GPL3](https://github.com/nagracks/py_duplicates/blob/master/LICENSE)
+[MIT](https://github.com/nagracks/py_duplicates/blob/master/LICENSE)
