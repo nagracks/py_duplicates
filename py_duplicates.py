@@ -12,49 +12,21 @@ import hashlib
 import os
 import sys
 
-def parse_args():
-    """Parse args with argparse
-    :returns: args
-
-    """
-    parser = argparse.ArgumentParser(description="Python Duplicates"
-                                                 " - Find duplicate")
-    parser.add_argument('path',
-                        action='store',
-                        help="path where to find duplicates")
-    parser.add_argument('-d',
-                        '--delete',
-                        action='store_true',
-                        help="delete all files with duplicates")
-    parser.add_argument('-i',
-                        '--interactive',
-                        action='store_true',
-                        help="interactively manage duplicates")
-    parser.add_argument('-s',
-                        '--summary',
-                        action='store_true',
-                        help="display summary of duplicate search")
-    parser.add_argument('-m',
-                        '--move',
-                        metavar='DIR',
-                        help="move all duplicates to another directory")
-
-    args = parser.parse_args()
-    return args
 
 def get_filesize(filename):
     """Get size of file as bytes
 
-    :filename: path to file
-    :returns (int): file size in bytes
+    :filename: str, path to file
+    :returns: int, file size in bytes
     """
     return os.stat(filename).st_size
+
 
 def get_hash_md5(filename):
     """Get md5 hash of filename
 
-    :filename: name of file
-    :returns: md5 hash
+    :filename: str, name of file
+    :returns: int, md5 hash
     """
     # md5 hash object #
     m = hashlib.md5()
@@ -75,6 +47,7 @@ def get_hash_md5(filename):
     # Return hexadecimal digits #
     return m.hexdigest()
 
+
 def get_filesize_dict(path):
     """Make size:file dictionary, {key=size:value=files}
 
@@ -87,6 +60,7 @@ def get_filesize_dict(path):
             full_path = os.path.join(base_dir, filename)
             filesize_dict[get_filesize(full_path)].append(full_path)
     return filesize_dict
+
 
 def hash_dict_from_filesize_dict(filesize_dict):
     """Make hash:file dictionary from filesize:file dictionary
@@ -104,6 +78,7 @@ def hash_dict_from_filesize_dict(filesize_dict):
             hash_file_dict[get_hash_md5(filepath)].append(filepath)
     return hash_file_dict
 
+
 def get_duplicates(hash_file_dict):
     """Get duplicate files
 
@@ -116,6 +91,7 @@ def get_duplicates(hash_file_dict):
         # Print them #
         if len(v) > 1:
             print ("Duplicate Files => {}".format(', '.join(v)))
+
 
 def summarize_duplicates(hash_file_dict):
     """Summarize file duplicate searching
@@ -135,6 +111,7 @@ def summarize_duplicates(hash_file_dict):
                 summary['empty'] += len(v)
     return summary
 
+
 def delete_all_duplicates(hash_file_dict):
     """Delete all files with duplicates
 
@@ -147,6 +124,7 @@ def delete_all_duplicates(hash_file_dict):
             for dup in v:
                 os.remove(dup)
     print ("All duplicate files are deleted.")
+
 
 def move_duplicates(hash_file_dict, dirname):
     """Move duplicates to location specified by parameter dirname
@@ -165,6 +143,7 @@ def move_duplicates(hash_file_dict, dirname):
             for dup in v:
                 os.rename(dup, os.path.join(dirname, os.path.basename(dup)))
     print ("All duplicate files are moved to {}.".format(dirname))
+
 
 def open_file(filename):
     """Opens file using default programs
@@ -230,10 +209,40 @@ def interactive_mode(hash_file_dict):
                             break
 
 
-
 if __name__ == "__main__":
-    # Commandline args #
-    args = parse_args()
+    parser = argparse.ArgumentParser(
+            description="Python Duplicates - Find duplicates"
+            )
+    parser.add_argument(
+            'path',
+            action='store',
+            help="path where to find duplicates"
+            )
+    parser.add_argument(
+            '-d',
+            '--delete',
+            action='store_true',
+            help="delete all files with duplicates"
+            )
+    parser.add_argument(
+            '-i',
+            '--interactive',
+            action='store_true',
+            help="interactively manage duplicates"
+            )
+    parser.add_argument(
+            '-s',
+            '--summary',
+            action='store_true',
+            help="display summary of duplicate search"
+            )
+    parser.add_argument(
+            '-m',
+            '--move',
+            metavar='DIR',
+            help="move all duplicates to another directory"
+            )
+    args = parser.parse_args()
 
     filesize_dict = get_filesize_dict(args.path)
     hash_file_dict = hash_dict_from_filesize_dict(filesize_dict)
@@ -245,7 +254,9 @@ if __name__ == "__main__":
     elif args.summary:
         summary = summarize_duplicates(hash_file_dict)
         print("** summary **")
-        print("{dupcount} files have duplicates, having a total of \
-{duptotal} duplicate files.\n{empty} files are empty.".format(**summary))
+        print(
+            "{dupcount} files have duplicates, having a total of {duptotal}"
+            " duplicate files.\n{empty} files are empty.".format(**summary)
+            )
     elif args.move:
         move_duplicates(hash_file_dict, args.move)
