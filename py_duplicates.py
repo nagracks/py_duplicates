@@ -12,7 +12,6 @@ import hashlib
 import os
 import sys
 
-
 def get_filesize(filename):
     """Get size of file as bytes
 
@@ -214,10 +213,9 @@ if __name__ == "__main__":
             description="Python Duplicates - Find duplicates"
             )
     parser.add_argument(
-            'path',
-            action='store',
-            help="path where to find duplicates"
-            )
+            'paths',
+            nargs='+',
+            help="paths where to find duplicates")
     parser.add_argument(
             '-d',
             '--delete',
@@ -244,7 +242,10 @@ if __name__ == "__main__":
             )
     args = parser.parse_args()
 
-    filesize_dict = get_filesize_dict(args.path)
+    if len(args.paths) in (1, 2):
+        path = args.paths[0]
+
+    filesize_dict = get_filesize_dict(path)
     hash_file_dict = hash_dict_from_filesize_dict(filesize_dict)
     get_duplicates(hash_file_dict)
     if args.delete:
