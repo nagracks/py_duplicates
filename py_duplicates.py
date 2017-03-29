@@ -77,9 +77,8 @@ def hash_dict_from_filesize_dict(filesize_dict):
             hash_file_dict[get_hash_md5(filepath)].append(filepath)
     return hash_file_dict
 
-
-def get_duplicates(hash_file_dict):
-    """Get duplicate files
+def print_duplicates(hash_file_dict):
+    """Print duplicate files
 
     :hash_file_dict: dictionary, contains hash:files
     :returns: None
@@ -207,6 +206,15 @@ def interactive_mode(hash_file_dict):
                                 os.path.join(destdir, os.path.basename(dup)))
                             break
 
+def get_duplicates(path):
+    """
+        From a specific path, returns duplicates path dictionnary
+        returns:{key:hash, value:filename}
+    """
+    filesize_dict = get_filesize_dict(path)
+    hash_file_dict = hash_dict_from_filesize_dict(filesize_dict)
+    return hash_file_dict
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -245,13 +253,13 @@ if __name__ == "__main__":
     if len(args.paths) in (1, 2):
         path = args.paths[0]
 
-    filesize_dict = get_filesize_dict(path)
-    hash_file_dict = hash_dict_from_filesize_dict(filesize_dict)
-    get_duplicates(hash_file_dict)
+    duplicates_dict = get_duplicates(path)
+    print_duplicates(duplicates_dict)
+
     if args.delete:
-        delete_all_duplicates(hash_file_dict)
+        delete_all_duplicates(duplicates_dict)
     elif args.interactive:
-        interactive_mode(hash_file_dict)
+        interactive_mode(duplicates_dict)
     elif args.summary:
         summary = summarize_duplicates(hash_file_dict)
         print("** summary **")
