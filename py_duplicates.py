@@ -12,19 +12,18 @@ import hashlib
 import os
 import sys
 
-def get_filesize(filename):
+def get_filesize(filepath):
     """
         Get size of file as bytes
-        :filename: path to file
+        :filepath: path to file
         :returns: int, file size in bytes
     """
-    return os.stat(filename).st_size
+    return os.stat(filepath).st_size
 
-
-def get_hash_md5(filename):
+def get_hash_md5(filepath):
     """
-        Get md5 hash of filename
-        :filename: name of file
+        Get md5 hash of a file
+        :filepath: path of file
         :returns: md5 hash
     """
     # md5 hash object #
@@ -33,7 +32,7 @@ def get_hash_md5(filename):
         # Don't read at once #
         # Because it will be inefficient if file is large #
         # Read in 1024 chunks #
-        with open(filename, 'rb', 1024) as f:
+        with open(filepath, 'rb', 1024) as f:
             # Read data until there is no data #
             while True:
                 data = f.read(1024)
@@ -139,18 +138,18 @@ def move_duplicates(hash_file_dict, dirname):
     print ("All duplicate files are moved to {}.".format(dirname))
 
 
-def open_file(filename):
+def open_file(filepath):
     """
         Opens file using default programs
-        :filename: filename of the file to be openned
+        :filepath: filepath of the file to be openned
         :returns: None
     """
     if sys.platform.startswith('darwin'):   # mac
-        os.system("open {}".format(filename))
+        os.system("open {}".format(filepath))
     elif os.name == 'nt':                   # windows
-        os.system("start {}".format(filename))
+        os.system("start {}".format(filepath))
     elif os.name == 'posix':                # unix
-        os.system("xdg-open {}".format(filename))
+        os.system("xdg-open {}".format(filepath))
 
 
 def interactive_mode(hash_file_dict):
@@ -205,7 +204,7 @@ def interactive_mode(hash_file_dict):
 def get_duplicates(path):
     """
         From a specific path, returns duplicates path dictionnary
-        returns:{key:hash, value:filename}
+        returns:{key:hash, value:filepath}
     """
     filesize_dict = get_filesize_dict(path)
     hash_file_dict = hash_dict_from_filesize_dict(filesize_dict)
