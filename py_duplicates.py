@@ -13,19 +13,19 @@ import os
 import sys
 
 def get_filesize(filename):
-    """Get size of file as bytes
-
-    :filename: str, path to file
-    :returns: int, file size in bytes
+    """
+        Get size of file as bytes
+        :filename: path to file
+        :returns: int, file size in bytes
     """
     return os.stat(filename).st_size
 
 
 def get_hash_md5(filename):
-    """Get md5 hash of filename
-
-    :filename: str, name of file
-    :returns: int, md5 hash
+    """
+        Get md5 hash of filename
+        :filename: name of file
+        :returns: md5 hash
     """
     # md5 hash object #
     m = hashlib.md5()
@@ -48,10 +48,10 @@ def get_hash_md5(filename):
 
 
 def get_filesize_dict(path):
-    """Make size:file dictionary, {key=size:value=files}
-
-    :path: full path of file
-    :returns: dictionary
+    """
+        Make size:file dictionary, {key=size:value=files}
+        :path: full path of file
+        :returns: dictionary
     """
     filesize_dict = collections.defaultdict(list)
     for base_dir, dirs, files in os.walk(path):
@@ -62,11 +62,11 @@ def get_filesize_dict(path):
 
 
 def hash_dict_from_filesize_dict(filesize_dict):
-    """Make hash:file dictionary from filesize:file dictionary
-
-    Note: only includes files which have duplicate filesizes.
-
-    :filesize_dict: dictionary, contains filesize:files
+    """
+        Make hash:file dictionary from filesize:file dictionary
+        Note: only includes files which have duplicate filesizes.
+        :filesize_dict: dictionary, contains filesize:files
+        returns: hash_file_dict {key=hash, value=filepath}
     """
 
     hash_file_dict = collections.defaultdict(list)
@@ -78,11 +78,10 @@ def hash_dict_from_filesize_dict(filesize_dict):
     return hash_file_dict
 
 def print_duplicates(hash_file_dict):
-    """Print duplicate files
-
-    :hash_file_dict: dictionary, contains hash:files
-    :returns: None
-
+    """
+        Print duplicate files
+        :hash_file_dict: dictionary, contains hash:files
+        :returns: None
     """
     for k, v in hash_file_dict.items():
         # If it contain duplicates #
@@ -92,11 +91,10 @@ def print_duplicates(hash_file_dict):
 
 
 def summarize_duplicates(hash_file_dict):
-    """Summarize file duplicate searching
-
-    :hash_file_dict: dictionary, contains hash:files
-    :returns: dictionary containing the search summary
-
+    """
+        Summarize file duplicate searching
+        :hash_file_dict: dictionary, contains hash:files
+        :returns: dictionary containing the search summary
     """
     summary = { 'dupcount' : 0,     # number of unique files with duplicates
                 'empty' : 0,        # number of empty files
@@ -111,11 +109,10 @@ def summarize_duplicates(hash_file_dict):
 
 
 def delete_all_duplicates(hash_file_dict):
-    """Delete all files with duplicates
-
-    :hash_file_dict: dictionary, contains hash:files
-    :returns: None
-
+    """
+        Delete all files with duplicates
+        :hash_file_dict: dictionary, contains hash:files
+        :returns: None
     """
     for k, v in hash_file_dict.items():
         if len(v) > 1:
@@ -125,12 +122,11 @@ def delete_all_duplicates(hash_file_dict):
 
 
 def move_duplicates(hash_file_dict, dirname):
-    """Move duplicates to location specified by parameter dirname
-
-    :hash_file_dict: dictionary, contains hash:files
-    :dirname: location on where to transfer duplicates
-    :returns: None
-
+    """
+        Move duplicates to location specified by parameter dirname
+        :hash_file_dict: dictionary, contains hash:files
+        :dirname: location on where to transfer duplicates
+        :returns: None
     """
     if not os.path.isdir(dirname):
         print("Invalid Directory {}. Aborted.".format(dirname))
@@ -144,11 +140,11 @@ def move_duplicates(hash_file_dict, dirname):
 
 
 def open_file(filename):
-    """Opens file using default programs
-    :filename: filename of the file to be openned
-    :returns: None
     """
-
+        Opens file using default programs
+        :filename: filename of the file to be openned
+        :returns: None
+    """
     if sys.platform.startswith('darwin'):   # mac
         os.system("open {}".format(filename))
     elif os.name == 'nt':                   # windows
@@ -158,13 +154,13 @@ def open_file(filename):
 
 
 def interactive_mode(hash_file_dict):
-    """Interactively go through each of the duplicate files to choose action.
-    Interactive actions on individual files include:
-        [d]eleting duplicate
-        [v]iew file contents
-    :hash_file_dict: dictionary, contains hash:files
-    :returns: None
-
+    """
+        Interactively go through each of the duplicate files to choose action.
+        Interactive actions on individual files include:
+            [d]eleting duplicate
+            [v]iew file contents
+        :hash_file_dict: dictionary, contains hash:files
+        :returns: None
     """
     print("=" * 80)
     for k, v in hash_file_dict.items():
