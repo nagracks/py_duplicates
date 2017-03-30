@@ -45,14 +45,13 @@ def get_hash_md5(filepath):
     # Return hexadecimal digits #
     return m.hexdigest()
 
-
-def get_filesize_dict(path):
+def get_filesize_dict(path, filesize_dict):
     """
         Make size:file dictionary, {key=size:value=files}
         :path: full path of file
-        :returns: dictionary
+        :filesize_dict {key=size:value=files}
+        :returns: the updated filesize_dict
     """
-    filesize_dict = collections.defaultdict(list)
     for base_dir, dirs, files in os.walk(path):
         for filename in files:
             full_path = os.path.join(base_dir, filename)
@@ -201,15 +200,17 @@ def interactive_mode(hash_file_dict):
                                 os.path.join(destdir, os.path.basename(dup)))
                             break
 
-def get_duplicates(path):
+def get_duplicates(paths):
     """
-        From a specific path, returns duplicates path dictionnary
-        returns:{key:hash, value:filepath}
+        From a list of paths, returns duplicates path dictionnary
+        returns:{key:hash, value:filename}
     """
-    filesize_dict = get_filesize_dict(path)
+    filesize_dict = collections.defaultdict(list)
+    for path in paths:
+        filesize_dict = get_filesize_dict(path, filesize_dict)
+
     hash_file_dict = hash_dict_from_filesize_dict(filesize_dict)
     return hash_file_dict
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -245,12 +246,9 @@ if __name__ == "__main__":
             )
     args = parser.parse_args()
 
-    if len(args.paths) in (1, 2):
-        path = args.paths[0]
+    duplicates_dict = get_duplicates(args.paths)
 
-    duplicates_dict = get_duplicates(path)
     print_duplicates(duplicates_dict)
-
     if args.delete:
         delete_all_duplicates(duplicates_dict)
     elif args.interactive:
