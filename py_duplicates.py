@@ -12,21 +12,19 @@ import hashlib
 import os
 import sys
 
-
-def get_filesize(filename):
-    """Get size of file as bytes
-
-    :filename: str, path to file
-    :returns: int, file size in bytes
+def get_filesize(filepath):
     """
-    return os.stat(filename).st_size
+        Get size of file as bytes
+        :filepath: path to file
+        :returns: int, file size in bytes
+    """
+    return os.stat(filepath).st_size
 
-
-def get_hash_md5(filename):
-    """Get md5 hash of filename
-
-    :filename: str, name of file
-    :returns: int, md5 hash
+def get_hash_md5(filepath):
+    """
+        Get md5 hash of a file
+        :filepath: path of file
+        :returns: md5 hash
     """
     # md5 hash object #
     m = hashlib.md5()
@@ -34,7 +32,7 @@ def get_hash_md5(filename):
         # Don't read at once #
         # Because it will be inefficient if file is large #
         # Read in 1024 chunks #
-        with open(filename, 'rb', 1024) as f:
+        with open(filepath, 'rb', 1024) as f:
             # Read data until there is no data #
             while True:
                 data = f.read(1024)
@@ -47,14 +45,13 @@ def get_hash_md5(filename):
     # Return hexadecimal digits #
     return m.hexdigest()
 
-
-def get_filesize_dict(path):
-    """Make size:file dictionary, {key=size:value=files}
-
-    :path: full path of file
-    :returns: dictionary
+def get_filesize_dict(path, filesize_dict):
     """
-    filesize_dict = collections.defaultdict(list)
+        Make size:file dictionary, {key=size:value=files}
+        :path: full path of file
+        :filesize_dict {key=size:value=files}
+        :returns: the updated filesize_dict
+    """
     for base_dir, dirs, files in os.walk(path):
         for filename in files:
             full_path = os.path.join(base_dir, filename)
@@ -63,11 +60,11 @@ def get_filesize_dict(path):
 
 
 def hash_dict_from_filesize_dict(filesize_dict):
-    """Make hash:file dictionary from filesize:file dictionary
-
-    Note: only includes files which have duplicate filesizes.
-
-    :filesize_dict: dictionary, contains filesize:files
+    """
+        Make hash:file dictionary from filesize:file dictionary
+        Note: only includes files which have duplicate filesizes.
+        :filesize_dict: dictionary, contains filesize:files
+        returns: hash_file_dict {key=hash, value=filepath}
     """
 
     hash_file_dict = collections.defaultdict(list)
@@ -78,13 +75,11 @@ def hash_dict_from_filesize_dict(filesize_dict):
             hash_file_dict[get_hash_md5(filepath)].append(filepath)
     return hash_file_dict
 
-
-def get_duplicates(hash_file_dict):
-    """Get duplicate files
-
-    :hash_file_dict: dictionary, contains hash:files
-    :returns: None
-
+def print_duplicates(hash_file_dict):
+    """
+        Print duplicate files
+        :hash_file_dict: dictionary, contains hash:files
+        :returns: None
     """
     for k, v in hash_file_dict.items():
         # If it contain duplicates #
@@ -94,11 +89,10 @@ def get_duplicates(hash_file_dict):
 
 
 def summarize_duplicates(hash_file_dict):
-    """Summarize file duplicate searching
-
-    :hash_file_dict: dictionary, contains hash:files
-    :returns: dictionary containing the search summary
-
+    """
+        Summarize file duplicate searching
+        :hash_file_dict: dictionary, contains hash:files
+        :returns: dictionary containing the search summary
     """
     summary = { 'dupcount' : 0,     # number of unique files with duplicates
                 'empty' : 0,        # number of empty files
@@ -113,11 +107,10 @@ def summarize_duplicates(hash_file_dict):
 
 
 def delete_all_duplicates(hash_file_dict):
-    """Delete all files with duplicates
-
-    :hash_file_dict: dictionary, contains hash:files
-    :returns: None
-
+    """
+        Delete all files with duplicates
+        :hash_file_dict: dictionary, contains hash:files
+        :returns: None
     """
     for k, v in hash_file_dict.items():
         if len(v) > 1:
@@ -127,12 +120,11 @@ def delete_all_duplicates(hash_file_dict):
 
 
 def move_duplicates(hash_file_dict, dirname):
-    """Move duplicates to location specified by parameter dirname
-
-    :hash_file_dict: dictionary, contains hash:files
-    :dirname: location on where to transfer duplicates
-    :returns: None
-
+    """
+        Move duplicates to location specified by parameter dirname
+        :hash_file_dict: dictionary, contains hash:files
+        :dirname: location on where to transfer duplicates
+        :returns: None
     """
     if not os.path.isdir(dirname):
         print("Invalid Directory {}. Aborted.".format(dirname))
@@ -145,28 +137,28 @@ def move_duplicates(hash_file_dict, dirname):
     print ("All duplicate files are moved to {}.".format(dirname))
 
 
-def open_file(filename):
-    """Opens file using default programs
-    :filename: filename of the file to be openned
-    :returns: None
+def open_file(filepath):
     """
-
+        Opens file using default programs
+        :filepath: filepath of the file to be openned
+        :returns: None
+    """
     if sys.platform.startswith('darwin'):   # mac
-        os.system("open {}".format(filename))
+        os.system("open {}".format(filepath))
     elif os.name == 'nt':                   # windows
-        os.system("start {}".format(filename))
+        os.system("start {}".format(filepath))
     elif os.name == 'posix':                # unix
-        os.system("xdg-open {}".format(filename))
+        os.system("xdg-open {}".format(filepath))
 
 
 def interactive_mode(hash_file_dict):
-    """Interactively go through each of the duplicate files to choose action.
-    Interactive actions on individual files include:
-        [d]eleting duplicate
-        [v]iew file contents
-    :hash_file_dict: dictionary, contains hash:files
-    :returns: None
-
+    """
+        Interactively go through each of the duplicate files to choose action.
+        Interactive actions on individual files include:
+            [d]eleting duplicate
+            [v]iew file contents
+        :hash_file_dict: dictionary, contains hash:files
+        :returns: None
     """
     print("=" * 80)
     for k, v in hash_file_dict.items():
@@ -208,16 +200,26 @@ def interactive_mode(hash_file_dict):
                                 os.path.join(destdir, os.path.basename(dup)))
                             break
 
+def get_duplicates(paths):
+    """
+        From a list of paths, returns duplicates path dictionnary
+        returns:{key:hash, value:filename}
+    """
+    filesize_dict = collections.defaultdict(list)
+    for path in paths:
+        filesize_dict = get_filesize_dict(path, filesize_dict)
+
+    hash_file_dict = hash_dict_from_filesize_dict(filesize_dict)
+    return hash_file_dict
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
             description="Python Duplicates - Find duplicates"
             )
     parser.add_argument(
-            'path',
-            action='store',
-            help="path where to find duplicates"
-            )
+            'paths',
+            nargs='+',
+            help="paths where to find duplicates")
     parser.add_argument(
             '-d',
             '--delete',
@@ -244,19 +246,19 @@ if __name__ == "__main__":
             )
     args = parser.parse_args()
 
-    filesize_dict = get_filesize_dict(args.path)
-    hash_file_dict = hash_dict_from_filesize_dict(filesize_dict)
-    get_duplicates(hash_file_dict)
+    duplicates_dict = get_duplicates(args.paths)
+
+    print_duplicates(duplicates_dict)
     if args.delete:
-        delete_all_duplicates(hash_file_dict)
+        delete_all_duplicates(duplicates_dict)
     elif args.interactive:
-        interactive_mode(hash_file_dict)
+        interactive_mode(duplicates_dict)
     elif args.summary:
-        summary = summarize_duplicates(hash_file_dict)
+        summary = summarize_duplicates(duplicates_dict)
         print("** summary **")
         print(
             "{dupcount} files have duplicates, having a total of {duptotal}"
             " duplicate files.\n{empty} files are empty.".format(**summary)
             )
     elif args.move:
-        move_duplicates(hash_file_dict, args.move)
+        move_duplicates(duplicates_dict, args.move)
