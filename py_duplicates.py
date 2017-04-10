@@ -254,11 +254,11 @@ if __name__ == "__main__":
     elif args.interactive:
         interactive_mode(duplicates_dict)
     elif args.summary:
-        summary = summarize_duplicates(hash_file_dict)
+        summary = summarize_duplicates(duplicates_dict)
         print("** summary **")
         print(
             "{dupcount} files have duplicates, having a total of {duptotal}"
             " duplicate files.\n{empty} files are empty.".format(**summary)
             )
     elif args.move:
-        move_duplicates(hash_file_dict, args.move)
+        move_duplicates(duplicates_dict, args.move)
